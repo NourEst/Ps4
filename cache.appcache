@@ -1,1 +1,19 @@
+CACHE MANIFEST
+# build wobkot-v1
 
+index.html
+src/main.js
+src/kernel.js
+src/lapse.js
+src/misc.js
+src/thread.js
+src/userland.js
+src/worker.js
+src/ps4/impl.js
+src/ps4/payload.bin
+
+NETWORK:
+*
+
+FALLBACK:
+index.html index.html
