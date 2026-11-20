@@ -1,29 +1,72 @@
-<!doctype html>
-<html>
-  <head>
+<!DOCTYPE html>
+<html manifest="cache.appcache">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Wobkot Auto Jailbreak</title>
     <style>
-      html,
-      body {
-        height: 100%;
-        margin: 0;
-      }
-      #console {
-        width: 100%;
-        height: 100%;
-        margin: 0;
-        padding: 20px;
-        font-size: 12px;
-        overflow: auto;
-        box-sizing: border-box;
-        font-family: 'Lucida Console', 'Courier New', 'Menlo';
-        background-color: #131416;
-        color: #c1c2c5;
-      }
+        body { background: #0b0d10; color: #c8ced8; font-family: sans-serif; text-align: center; padding-top: 50px; }
+        h1 { color: #fff; }
+        #btn { display: none; width: 80%; max-width: 400px; padding: 25px; background: #2ea043; color: white; font-size: 24px; font-weight: bold; border: none; border-radius: 8px; cursor: pointer; }
+        #status { margin-top: 20px; font-size: 14px; color: #7fd0a0; }
     </style>
-    <script src="src/main.js" defer></script>
-    <title>Wobkot</title>
-  </head>
-  <body>
-    <pre id="console"></pre>
-  </body>
+</head>
+<body>
+    <h1>WOBKOT JAILBREAK</h1>
+    <div id="status">Checking cache...</div>
+    
+    <button id="btn" onclick="runExploit()">RUN JAILBREAK</button>
+
+    <iframe id="hiddenFrame" style="display:none;"></iframe>
+
+    <script>
+        var statusEl = document.getElementById('status');
+        var btnEl = document.getElementById('btn');
+
+        // This tells Wobkot where to look for its files
+        window.wobkot_source = "src";
+
+        function runExploit() {
+            btnEl.style.display = "none";
+            statusEl.innerHTML = "<b>Running Exploit... Do not close the browser.</b>";
+            statusEl.style.color = "#d8c07f";
+            
+            // Wobkot needs to run inside an iframe to not freeze the main page
+            var frame = document.getElementById('hiddenFrame');
+            frame.srcdoc = `
+                <html>
+                <head>
+                    <base href="${window.location.href}src/">
+                </head>
+                <body>
+                    <script>window.wobkot_source = "${window.location.href}src/";<\/script>
+                    <script src="main.js"><\/script>
+                </body>
+                </html>
+            `;
+        }
+
+        // CACHE LOGIC
+        var appCache = window.applicationCache;
+        if (!appCache || !document.documentElement.hasAttribute("manifest")) {
+            statusEl.textContent = "Cache bypassed. Ready.";
+            btnEl.style.display = "block";
+        } else if (!navigator.onLine) {
+            statusEl.textContent = "Loaded from offline cache.";
+            btnEl.style.display = "block";
+        } else if (appCache.status === appCache.IDLE || appCache.status === appCache.UPDATEREADY) {
+            statusEl.textContent = "Cached and ready.";
+            btnEl.style.display = "block";
+        } else {
+            statusEl.textContent = "Caching files for offline (first run)...";
+            appCache.addEventListener('progress', function(e) {
+                if (e.total) statusEl.textContent = "Caching: " + Math.round((e.loaded / e.total) * 100) + "%";
+            });
+            appCache.addEventListener('cached', function() {
+                statusEl.textContent = "Cached successfully! You can go offline now.";
+                btnEl.style.display = "block";
+            });
+        }
+    </script>
+</body>
 </html>
