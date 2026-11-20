@@ -17,36 +17,35 @@
     
     <button id="btn" onclick="runExploit()">RUN JAILBREAK</button>
 
-    <iframe id="hiddenFrame" style="display:none;"></iframe>
-
     <script>
+        // --- 1. ERROR CATCHER ---
+        // If main.js crashes or is missing, this will show the error on screen
+        window.onerror = function(msg, url, line) {
+            var s = document.getElementById('status');
+            s.innerHTML = "<span style='color:red;'>ERROR: " + msg + "<br>File: " + url + "<br>Line: " + line + "</span>";
+            document.getElementById('btn').style.display = "block"; // Show button again
+            return false;
+        };
+
         var statusEl = document.getElementById('status');
         var btnEl = document.getElementById('btn');
 
-        // This tells Wobkot where to look for its files
-        window.wobkot_source = "src";
-
+        // --- 2. RUN EXPLOIT ---
         function runExploit() {
             btnEl.style.display = "none";
             statusEl.innerHTML = "<b>Running Exploit... Do not close the browser.</b>";
             statusEl.style.color = "#d8c07f";
             
-            // Wobkot needs to run inside an iframe to not freeze the main page
-            var frame = document.getElementById('hiddenFrame');
-            frame.srcdoc = `
-                <html>
-                <head>
-                    <base href="${window.location.href}src/">
-                </head>
-                <body>
-                    <script>window.wobkot_source = "${window.location.href}src/";<\/script>
-                    <script src="main.js"><\/script>
-                </body>
-                </html>
-            `;
+            // Tell Wobkot where its files are
+            window.wobkot_source = "src/";
+
+            // Load main.js directly (no iframe)
+            var script = document.createElement("script");
+            script.src = "src/main.js";
+            document.body.appendChild(script);
         }
 
-        // CACHE LOGIC
+        // --- 3. CACHE LOGIC ---
         var appCache = window.applicationCache;
         if (!appCache || !document.documentElement.hasAttribute("manifest")) {
             statusEl.textContent = "Cache bypassed. Ready.";
